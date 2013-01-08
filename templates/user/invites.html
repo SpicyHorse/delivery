@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}Invites{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Invites</h1>
+</div>
+
+<div class="row">
+    <div class="span12">
+        <div>
+            <p>
+                {% if g.user.invites > 0 -%}
+                    <h3>You have {{ g.user.invites }} left.</h3>
+                    <p>
+                    {% from "_forms.html" import render_form_inline %}
+                    {{ render_form_inline(form) }}
+                    </p>
+                {%- else -%}
+                    <h3>You do not have invites.</h3>
+                {%- endif %}
+            </p>
+            <hr>
+            {% if invites %}
+            <p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>                        
+                            <th>Date sent</th>
+                            <th>Reciever email</th>
+                            <th>Recieved by</th>
+                            <th>Date recieved</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in invites %}
+                        <tr>
+                            <td>{{ i.sha256 }}</td>
+                            <td>{{ i.issued_at }}</td>
+                            <td>{{ i.receiver_email }}</td>
+                            <td>{{ i.receiver }}</td>
+                            <td>{{ i.recieved_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </p>
+            {% else %}
+            <p>
+                <h3>You haven't invited anyone.</h3>
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

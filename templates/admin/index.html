@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Admin</h1>
+</div>
+
+<div class="row">
+    <div class="span3">
+        <h3>Пользователи:</h3>
+        <div>Всего:</div>
+        <div>Активно:</div>
+        <div>Положительных:</div>
+        <div>Отрицательных:</div>
+    </div>
+    <div class="span3">
+        <h3>Музыка:</h3>
+        <div>Всего релизов:</div>
+        <div>Всего файлов:</div>
+    </div>
+    <div class="span3">
+        <h3>Общение:</h3>
+        <div>Всего тем:</div>
+        <div>Всего сообщений:</div>
+    </div>
+    <div class="span3">
+        <h3>Движок:</h3>
+        <div>Uptime:</div>
+        <div>Очередь превью:</div>
+        <div>Версия:</div>
+    </div>
+</div>
+{% endblock %}

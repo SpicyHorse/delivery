@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<meta charset="utf-8">
+	<title>SpicyDelivery :: {% block title %}{% endblock %}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Spicyhorse delivery center">
+	<meta name="author" content="Spicyhorse ltd">
+	<link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+	<style type="text/css">
+		body {
+			padding-top: 60px;
+			padding-bottom: 40px;
+		}
+		.center { text-align: center; }
+	</style>
+	{% block style %}{% endblock %}
+	<script src="/static/js/jquery-1.7.2.min.js"></script>
+	<script src="/static/js/bootstrap.min.js"></script>
+	{% block script %}{% endblock %}
+	</head>
+	<body>
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+					<a class="brand" href="{{ url_for('index') }}"><strong>Spicy</strong>&thinsp;Delivery</a>
+					<div class="nav-collapse">
+						<ul class="nav">
+							<li class="{{ g.is_active('channel') }}"><a href="{{ url_for('channel_index') }}">Channel</a></li>
+						</ul>
+					</div>
+					<div class="btn-group pull-right">
+						{% if g.user %}
+						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+							<i class="icon-user"></i> {{ g.user.name }}
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							{% if g.user.is_admin -%}
+							<li><a href="{{ url_for('admin_index') }}"><i class="icon-lock"></i> Admin</a></li>
+							<li class="divider"></li>
+							{%- endif %}
+							<li><a href="{{ url_for('user_profile') }}"><i class="icon-home"></i> Profile</a></li>
+							<li class="divider"></li>
+							<li><a href="{{ url_for('user_logout') }}"><i class="icon-off"></i> Sign Out</a></li>
+						</ul>
+						{% else %}
+						<a class="btn" href="{{ url_for('user_login') }}">
+							<i class="icon-user"></i> Login
+						</a>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			{% with messages = get_flashed_messages(with_categories=true) %}
+			{% for category, message in messages %}
+			<div class="alert alert-{{ category }}">
+				<a class="close" data-dismiss="alert" href="#">×</a>
+				{{ message }}
+			</div>
+			{% endfor %}
+			{% endwith %}
+			
+			{% block content %}{% endblock %}
+			<hr>
+			
+			<footer>
+				<div class="center">Spicyhorse ltd 2013 &copy;</div>
+			</footer>
+		</div>
+	</body>
+</html>
