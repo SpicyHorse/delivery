@@ -62,7 +62,7 @@ class Channel(ModelBase):
 
 class Game(ModelBase):
 	id			= Column(Integer, primary_key=True)
-	name		= Column(String(128), nullable=False, unique=True)
+	name		= Column(String(128), nullable=False, index=True)
 	description	= Column(String(512))
 	channel_id	= Column(Integer, ForeignKey('Channel.id'), nullable=False)
 	# relations
@@ -74,7 +74,7 @@ class Game(ModelBase):
 
 class GameBuild(ModelBase):
 	id			= Column(Integer, primary_key=True)
-	name		= Column(String(128), nullable=False, unique=True)
+	name		= Column(String(128), nullable=False, index=True)
 	description	= Column(String(512))
 	md5			= Column(String(32), index=True)
 	current		= Column(Boolean, index=True, nullable=False, default=False)
