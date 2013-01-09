@@ -76,7 +76,7 @@ class Metainfo(dict):
 					if len(chunk) == 0:
 						# We exactly reached the end at last iteration
 						break
-					pieces.extend(sha1(chunk).digest())
+					pieces.extend(sha1(str(chunk)).digest())
 					if md5sum:
 						md5sum.update(chunk)
 					if len(chunk) < piece_length:
@@ -110,7 +110,7 @@ class Metainfo(dict):
 									md5sum.update(chunk)
 								break
 							# We have got a complete chunk
-							pieces.extend(sha1(incomplete_chunk + chunk).digest())
+							pieces.extend(sha1(str(incomplete_chunk + chunk)).digest())
 							incomplete_chunk = bytearray()
 							if md5sum:
 								md5sum.update(chunk)
@@ -119,7 +119,7 @@ class Metainfo(dict):
 					files.append(filedict)
 			if incomplete_chunk:
 				# We have an incomplete chunk left to hash
-				pieces.extend(sha1(incomplete_chunk).digest())
+				pieces.extend(sha1(str(incomplete_chunk)).digest())
 		if merkle:
 			# Merkle torrent: we calculate the Merkle tree's root node
 			# to use in in place of the pieces.
@@ -134,14 +134,14 @@ class Metainfo(dict):
 					pieces.extend(padding)
 				# Hash the hashes by two and store the result in place
 				for i in range(0, len(pieces) // 2, 20):
-					pieces[i:i + 20] = sha1(pieces[2*i:2*i + 40]).digest()
+					pieces[i:i + 20] = sha1(str(pieces[2*i:2*i + 40])).digest()
 				# Next level...
 				# Truncate the hash list as all our new pieces are now only
 				# in its first half.
 				del pieces[len(pieces)//2:]
 				# The padding at the new level is the result of hashing two
 				# padding pieces together, cf. BEP-30.
-				padding = sha1(2 * padding).digest()
+				padding = sha1(str(2 * padding)).digest()
 			info[b"root hash"] = pieces
 		else:
 			# Regular torrent: we use the pieces directly
@@ -154,29 +154,6 @@ class Metainfo(dict):
 			self.length = info[b"length"]
 		else :
 			self.length = None
-
-	@property
-	def infohash(self):
-		if not self.__infohash:
-			self.__infohash = sha1(bencode(self.info)).hexdigest()
-		return self.__infohash
-
-	def magnet(self):
-		params = OrderedDict()
-		params[b'dn'] = self.name
-		if self.length :
-			params[b'xl'] = ("%d" % self.length).encode('ascii')
-		params[b'xt'] = 'urn:btih:%s' % self.infohash
-		params[b'tr'] = []
-		if self.announce:
-			for tracker_list in self.announce:
-				for tracker in tracker_list:
-					params[b'tr'].append(tracker)
-		params[b'as'] = []
-		if self.url_list:
-			for url in self.url_list:
-				params[b'as'].append(url)
-		return "magnet:?%s" % urlencode(params, doseq=True, safe='/:')
 
 def encode_int(x, r):
 	r.extend(('i', str(x), 'e'))

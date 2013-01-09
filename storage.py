@@ -16,9 +16,6 @@ def create_game_folders(channel, game):
 	for base in [ config.UPLOAD_DIR, config.STORAGE_DIR ]:
 		game_folder = os.path.join(base, channel, game)
 		mkdir(game_folder)
-		for i in [ "win", "mac", "lin" ]:
-			game_folder_p = os.path.join(game_folder, i)
-			mkdir(game_folder_p)
 
 def prepare_build(channel, game, build):
 	# gen vars
