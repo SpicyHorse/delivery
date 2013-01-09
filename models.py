@@ -81,6 +81,7 @@ class GameBuild(ModelBase):
 	created_at	= Column(DateTime, nullable=False, default=datetime.now)
 	platform	= Column(Enum('WIN', 'MAC', 'LIN', name="platform"), nullable=False)
 	game_id		= Column(Integer, ForeignKey('Game.id'), nullable=False)
+	downloads	= Column(Integer, nullable=False, default=0)
 	# relations
 	game		= relation(Game, backref='builds')
 

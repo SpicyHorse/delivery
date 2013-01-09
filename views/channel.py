@@ -124,8 +124,11 @@ def torrent_check(channel, game, platform, md5):
 	if md5 == i.md5:
 		return make_response("FRESH", 200)
 	game_dst_torrent = os.path.join(config.STORAGE_DIR, channel, game, str(i.id), platform, "build.torrent")
+	i.downloads += 1
 	data = "UPDATE:"
 	data += open(game_dst_torrent).read()
+	g.db.add(i)
+	g.db.commit()
 	return make_response(data, 200)
 
 @app.route("/channel/<string:publisher>/<string:game>/<string:platform>/storage/<path:file_path>")

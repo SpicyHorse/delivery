@@ -23,13 +23,14 @@
 					<th style="width:60px;">Platform</th>
 					<th style="width:240px;">MD5</th>
 					<th>Description</th>
+					<th style="width:80px;">Downloads</th>
 					<th style="width:80px;">Active</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% if not game.builds %}
 				<tr>
-					<td colspan=6>
+					<td colspan=7>
 						<h3>Sorry, no builds for this game.</h3>
 					</td>
 				</tr>
@@ -41,6 +42,7 @@
 					<td>{{ b.platform }}</td>
 					<td>{{ b.md5 }}</td>
 					<td>{{ b.description }}</td>
+					<td>{{ b.downloads }}</td>
 					<td>{% if b.current %}Active{% else %}No, <a href="{{ url_for('channel_game_build_activate', channel=game.channel.name, game=game.name, platform=b.platform.lower(), build=b.id ) }}">activate</a>{% endif %}</td>
 				</tr>
 				{% endfor %}
