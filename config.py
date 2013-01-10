@@ -20,7 +20,7 @@ STORAGE_DIR		= "storage"
 UPLOAD_DIR		= "uploads"
 TRACKERS		= [
 	[	# Primary tracker, will use only them if possible
-		"http://delivery.spicyhorse.com:80/tracker",
+		"http://delivery.spicyhorse.com:80/announce",
 		"udp://delivery.spicyhorse.com:80",
 	],
 	[	# Secondary trackers, fallback option

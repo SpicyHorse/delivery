@@ -1,7 +1,7 @@
 from application import app, g, session, request, redirect, url_for
 from models import database_session, User
 
-__all__ = [ "admin", "user", "channel", "tracker" ]
+__all__ = [ "admin", "user", "channel" ]
 
 @app.route('/')
 def index():
