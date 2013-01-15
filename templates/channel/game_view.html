@@ -21,10 +21,9 @@
 					<th style="width:80px;">Build</th>
 					<th style="width:120px;">Created At</th>
 					<th style="width:60px;">Platform</th>
-					<th style="width:240px;">MD5</th>
 					<th>Description</th>
 					<th style="width:80px;">Downloads</th>
-					<th style="width:80px;">Active</th>
+					<th style="width:160px;">Active</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -40,14 +39,13 @@
 					<td>{{ b.name }}</td>
 					<td>{{ b.created_at }}</td>
 					<td>{{ b.platform }}</td>
-					<td>{{ b.md5 }}</td>
 					<td>{{ b.description }}</td>
 					<td>{{ b.downloads }}</td>
 					<td>
 						{% if b.current %}
 						Active
 						{% else %}
-						No, <a href="{{ url_for('channel_game_build_activate', channel=game.channel.name, game=game.name, platform=b.platform.lower(), build=b.id ) }}">activate</a>, <a href="{{ url_for('channel_game_build_wipe', channel=game.channel.name, game=game.name, platform=b.platform.lower(), build=b.id ) }}">activate</a>
+						No, <a href="{{ url_for('channel_game_build_activate', channel=game.channel.name, game=game.name, platform=b.platform.lower(), build=b.id ) }}">activate</a>, <a href="{{ url_for('channel_game_build_wipe', channel=game.channel.name, game=game.name, platform=b.platform.lower(), build=b.id ) }}">wipe</a>
 						{% endif %}
 					</td>
 				</tr>
