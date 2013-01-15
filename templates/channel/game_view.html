@@ -43,7 +43,13 @@
 					<td>{{ b.md5 }}</td>
 					<td>{{ b.description }}</td>
 					<td>{{ b.downloads }}</td>
-					<td>{% if b.current %}Active{% else %}No, <a href="{{ url_for('channel_game_build_activate', channel=game.channel.name, game=game.name, platform=b.platform.lower(), build=b.id ) }}">activate</a>{% endif %}</td>
+					<td>
+						{% if b.current %}
+						Active
+						{% else %}
+						No, <a href="{{ url_for('channel_game_build_activate', channel=game.channel.name, game=game.name, platform=b.platform.lower(), build=b.id ) }}">activate</a>, <a href="{{ url_for('channel_game_build_wipe', channel=game.channel.name, game=game.name, platform=b.platform.lower(), build=b.id ) }}">activate</a>
+						{% endif %}
+					</td>
 				</tr>
 				{% endfor %}
 			</tbody>

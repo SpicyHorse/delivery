@@ -1,3 +1,4 @@
+from shutil import rmtree
 from hashlib import md5
 import os
 
@@ -29,11 +30,19 @@ def prepare_build(channel, game, build):
 	r = os.system("rsync -a %s/ %s/" % (game_src_dir, game_dst_dir))
 	if r != 0:
 		raise Exception("Unable to syncronize game folder")
+	r = os.system("chmod 755 -R %s/" % game_dst_dir)
+	if r != 0:
+		raise Exception("Unable to set proper permission")
 	# create torrent
 	torrent = bencode(Metainfo(game_src_dir, announce=config.TRACKERS, url_list=storage_url))
 	open(game_dst_torrent,"w").write(torrent)
 	# add signature to build
 	build.md5 = md5(torrent).hexdigest()
+
+def wipe_build(channel, game, build):
+	# gen vars
+	game_dst_base = os.path.join(config.STORAGE_DIR, channel, game, str(build.id))
+	rmtree(game_dst_base)
 
 def get_torrent_content(channel, game, platform):
 	game_path = os.path.join(config.STORAGE_DIR, channel, game, platform)

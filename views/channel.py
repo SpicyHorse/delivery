@@ -104,6 +104,19 @@ def channel_game_build_activate(channel, game, platform, build):
 	g.db.commit()
 	return redirect(url_for('channel_game_view', channel=channel, game=game))
 
+@app.route("/channel/<string:channel>/<string:game>/<string:platform>/wipe/<int:build>", methods=['GET', 'POST'])
+@require_login
+def channel_game_build_wipe(channel, game, platform, build):
+	i = g.db.query(GameBuild).filter(GameBuild.id == build).first()
+	if not i:
+		return abort(404)
+	if i.current:
+		return abort(404)
+	wipe_build(channel, game, game_build)
+	g.db.delete(i)
+	g.db.commit()
+	return redirect(url_for('channel_game_view', channel=channel, game=game))
+
 #
 # Public part
 #
