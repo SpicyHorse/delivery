@@ -112,7 +112,7 @@ def channel_game_build_wipe(channel, game, platform, build):
 		return abort(404)
 	if i.current:
 		return abort(404)
-	wipe_build(channel, game, game_build)
+	wipe_build(channel, game, i)
 	g.db.delete(i)
 	g.db.commit()
 	return redirect(url_for('channel_game_view', channel=channel, game=game))
