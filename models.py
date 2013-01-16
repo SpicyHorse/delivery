@@ -66,7 +66,7 @@ class Game(ModelBase):
 	description	= Column(String(512))
 	channel_id	= Column(Integer, ForeignKey('Channel.id'), nullable=False)
 	# relations
-	channel		= relation(Channel, backref='games')
+	channel		= relation(Channel, backref=backref('games', order_by="Game.id"))
 
 	def __init__(self, name=None, description=None):
 		self.name = name
@@ -83,7 +83,7 @@ class GameBuild(ModelBase):
 	game_id		= Column(Integer, ForeignKey('Game.id'), nullable=False)
 	downloads	= Column(Integer, nullable=False, default=0)
 	# relations
-	game		= relation(Game, backref='builds')
+	game		= relation(Game, backref=backref('builds', order_by="GameBuild.id"))
 
 	def __init__(self, name=None, description=None):
 		self.name = name
