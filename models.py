@@ -65,6 +65,7 @@ class Game(ModelBase):
 	name		= Column(String(128), nullable=False, index=True)
 	description	= Column(String(512))
 	channel_id	= Column(Integer, ForeignKey('Channel.id'), nullable=False)
+	url			= Column(String(512))
 	# relations
 	channel		= relation(Channel, backref=backref('games', order_by="Game.id"))
 
@@ -76,7 +77,9 @@ class GameBuild(ModelBase):
 	id			= Column(Integer, primary_key=True)
 	name		= Column(String(128), nullable=False, index=True)
 	description	= Column(String(512))
+	state		= Column(Enum('INIT', 'READY', name="state"), nullable=False, default="INIT")
 	md5			= Column(String(32), index=True)
+	infohash	= Column(String(40), index=True)
 	current		= Column(Boolean, index=True, nullable=False, default=False)
 	created_at	= Column(DateTime, nullable=False, default=datetime.now)
 	platform	= Column(Enum('WIN', 'MAC', 'LIN', name="platform"), nullable=False)

@@ -9,7 +9,7 @@ __all__ = [ "Metainfo", "bencode" ]
 class Metainfo(dict):
 	def __init__(self, filename, announce=None, nodes=None, httpseeds=None,
 				 url_list=None, comment=None, piece_length=256*1024,
-				 private=False, md5sum=False, merkle=False):
+				 private=False, merkle=False):
 		"""Create a BitTorrent metainfo structure (cf. BEP-3).
 
 		Positional arguments:
@@ -30,7 +30,6 @@ class Metainfo(dict):
 						will be split (defaults to 256 kibi, cf. BEP-3)
 		private		 -- forbid DHT and peer exchange (optional, defaults to False,
 						cf. BEP-27)
-		md5sum		 -- include the MD5 hash of the files (optional, defaults to False)
 		merkle		 -- generate a Merkle torrent (defaults to False, cf. BEP-30)
 
 		Return: a dictionary-like structure, ready to be bencoded
@@ -41,35 +40,33 @@ class Metainfo(dict):
 
 		"""
 		if announce:
-			self[b"announce"] = announce[0][0]
+			self["announce"] = announce[0][0]
 			if len(announce[0]) > 1 or len(announce) > 1 :
-				self[b"announce-list"] = announce
+				self["announce-list"] = announce
 		self.announce = announce
 		if nodes:
-			self[b"nodes"] = nodes
+			self["nodes"] = nodes
 		self.nodes = nodes
 		if httpseeds:
-			self[b"httpseeds"] = httpseeds
+			self["httpseeds"] = httpseeds
 		self.httpseeds = httpseeds
 		if url_list:
-			self[b"url-list"] = url_list
+			self["url-list"] = url_list
 		self.url_list = url_list
-		self[b"creation date"] = int(time())
+		self["creation date"] = int(time())
 		if comment:
-			self[b"comment"] = comment
-		self[b"created by"] = "SpicyDelivery".encode('utf-8')
+			self["comment"] = comment
+		self["created by"] = "SpicyDelivery".encode('utf-8')
 		# Now we build the info dictionnary
-		self[b"info"] = {}
-		info = self[b"info"]
-		info[b"piece length"] = piece_length
+		self["info"] = {}
+		info = self["info"]
+		info["piece length"] = piece_length
 		pieces = bytearray()
 		if private:
-			info[b"private"] = 1
-		info[b"name"] = os.path.basename(os.path.normpath(filename))
+			info["private"] = 1
+		info["name"] = os.path.basename(os.path.normpath(filename))
 		if os.path.isfile(filename):
-			info[b"length"] = os.path.getsize(filename)
-			if md5sum:
-				md5sum = md5()
+			info["length"] = os.path.getsize(filename)
 			with open(filename, mode='rb') as f:
 				while True:
 					chunk = f.read(piece_length)
@@ -77,26 +74,20 @@ class Metainfo(dict):
 						# We exactly reached the end at last iteration
 						break
 					pieces.extend(sha1(str(chunk)).digest())
-					if md5sum:
-						md5sum.update(chunk)
 					if len(chunk) < piece_length:
 						# We have reached the end
 						break
-			if md5sum:
-				info[b"md5sum"] = md5sum.hexdigest().encode('ascii')
 		elif os.path.isdir(filename):
 			dirname = filename
-			info[b"files"] = []
-			files = info[b"files"]
+			info["files"] = []
+			files = info["files"]
 			incomplete_chunk = bytearray()
 			for dirpath, dirnames, filenames in os.walk(dirname):
 				for filename in filenames:
 					filedict = {}
 					filename = os.path.join(dirpath, filename)
-					filedict[b"path"] = os.path.relpath(filename, dirname).split(os.sep.encode('ascii'))
-					filedict[b"length"] = os.path.getsize(filename)
-					if md5sum:
-						md5sum = md5()
+					filedict["path"] = os.path.relpath(filename, dirname).split(os.sep.encode('ascii'))
+					filedict["length"] = os.path.getsize(filename)
 					with open(filename, mode='rb') as f:
 						while True:
 							chunk = f.read(piece_length - len(incomplete_chunk))
@@ -106,16 +97,10 @@ class Metainfo(dict):
 							if len(incomplete_chunk) + len(chunk) < piece_length:
 								# We have reached the end and got an incomplete chunk
 								incomplete_chunk += chunk
-								if md5sum:
-									md5sum.update(chunk)
 								break
 							# We have got a complete chunk
 							pieces.extend(sha1(str(incomplete_chunk + chunk)).digest())
 							incomplete_chunk = bytearray()
-							if md5sum:
-								md5sum.update(chunk)
-					if md5sum:
-						filedict[b"md5sum"] = md5sum.hexdigest().encode('ascii')
 					files.append(filedict)
 			if incomplete_chunk:
 				# We have an incomplete chunk left to hash
@@ -123,7 +108,7 @@ class Metainfo(dict):
 		if merkle:
 			# Merkle torrent: we calculate the Merkle tree's root node
 			# to use in in place of the pieces.
-			padding = 20 * b"\0"
+			padding = 20 * "\0"
 			# Reduce the hashes until there is only one left
 			# (hashes are 20 bytes long).
 			while len(pieces) > 20:
@@ -142,18 +127,24 @@ class Metainfo(dict):
 				# The padding at the new level is the result of hashing two
 				# padding pieces together, cf. BEP-30.
 				padding = sha1(str(2 * padding)).digest()
-			info[b"root hash"] = pieces
+			info["root hash"] = pieces
 		else:
 			# Regular torrent: we use the pieces directly
-			info[b"pieces"] = pieces
+			info["pieces"] = pieces
 		# Shortcuts
 		self.info = info
 		self.__infohash = None
-		self.name = info[b"name"]
-		if b"length" in info :
-			self.length = info[b"length"]
+		self.name = info["name"]
+		if "length" in info :
+			self.length = info["length"]
 		else :
 			self.length = None
+
+	@property
+	def infohash(self):
+		if not self.__infohash:
+			self.__infohash = sha1(bencode(self.info)).hexdigest()
+		return self.__infohash
 
 def encode_int(x, r):
 	r.extend(('i', str(x), 'e'))

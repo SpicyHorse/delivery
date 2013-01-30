@@ -3,6 +3,8 @@ from models import *
 from forms import *
 from storage import *
 
+from urllib import urlopen
+
 @app.route("/channel/")
 @require_login
 def channel_index():
@@ -53,13 +55,47 @@ def channel_add_game(channel):
 		return redirect(url_for('channel_view', name=channel))
 	return render_template("form.html", title="Game form", form=f)
 
+@app.route("/channel/<string:channel>/<string:game>/edit", methods=['GET', 'POST'])
+@require_login
+def channel_game_edit(channel, game):
+	gm = g.db.query(Game)\
+		.options(joinedload(Game.builds, innerjoin=False))\
+		.filter(Channel.name == channel)\
+		.filter(Game.name==game)\
+		.first()
+	if not gm:
+		return abort(404)
+	f = GameForm(request.form, gm)
+	if request.method == 'POST' and f.validate():
+		n = gm.name
+		f.populate_obj(gm)
+		gm.name = n
+		g.db.add(gm)
+		g.db.commit()
+		flash('Ok computer','success')
+		return redirect(url_for('channel_game_view', channel=channel, game=game))
+	return render_template("form.html", title="Game form", form=f)
+
 @app.route("/channel/<string:channel>/<string:game>")
 @require_login
 def channel_game_view(channel, game):
 	i = g.db.query(Game).options(joinedload(Game.builds, innerjoin=False)).filter(Channel.name == channel).filter(Game.name==game).first()
 	if not i:
 		return abort(404)
-	return render_template("channel/game_view.html", game=i)
+	ts = {}
+	h = urlopen("http://delivery.spicyhorse.com/stats?mode=tpbs&format=txt")
+	for l in h.readlines():
+		l = l.strip().split(":")
+		ts[l[0]] = l[1:]
+	for b in i.builds:
+		if ts.has_key(b.infohash):
+			b.seeds = ts[b.infohash][0]
+			b.peers = ts[b.infohash][1]
+		else:
+			b.seeds = "-"
+			b.peers = "-"
+			
+	return render_template("channel/game_view.html", game=i, ts=ts)
 
 @app.route("/channel/<string:channel>/<string:game>/add_build", methods=['GET', 'POST'])
 @require_login
@@ -121,6 +157,8 @@ def channel_game_build_wipe(channel, game, platform, build):
 # Public part
 #
 
+launcher_url = lambda game: "LAUNCHER:%s" % game.url
+
 @app.route("/channel/<string:channel>/<string:game>/<string:platform>/latest/<string:md5>")
 def torrent_check(channel, game, platform, md5):
 	# Fast inner join for querying
@@ -134,6 +172,15 @@ def torrent_check(channel, game, platform, md5):
 		.first()
 	if not i:
 		return abort(404)
+	# check launcher version
+	if config.LAUNCHER_VERSION_CONTROL:
+		if request.headers.has_key('User-Agent'):
+			ua = request.headers['User-Agent']
+			if not ua.startswith("SpicyLauncher/") or int(ua.split("/")[1]) < config.LAUNCHER_VERSION_MIN:
+				return make_response(launcher_url(i.game), 200)
+		else:
+			return make_response(launcher_url(i.game), 200)
+	# check user torrent version
 	if md5 == i.md5:
 		return make_response("FRESH", 200)
 	game_dst_torrent = os.path.join(config.STORAGE_DIR, channel, game, str(i.id), platform, "build.torrent")

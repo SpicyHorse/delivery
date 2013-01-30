@@ -30,14 +30,16 @@ def prepare_build(channel, game, build):
 	r = os.system("rsync -a %s/ %s/" % (game_src_dir, game_dst_dir))
 	if r != 0:
 		raise Exception("Unable to syncronize game folder")
-	r = os.system("chmod 755 -R %s/" % game_dst_dir)
+	r = os.system("chmod -R 755 %s/" % game_dst_dir)
 	if r != 0:
 		raise Exception("Unable to set proper permission")
 	# create torrent
-	torrent = bencode(Metainfo(game_src_dir, announce=config.TRACKERS, url_list=storage_url))
-	open(game_dst_torrent,"w").write(torrent)
+	m = Metainfo(game_src_dir, announce=config.TRACKERS, url_list=storage_url)
+	t = bencode(m)
+	open(game_dst_torrent,"w").write(t)
 	# add signature to build
-	build.md5 = md5(torrent).hexdigest()
+	build.md5 = md5(t).hexdigest()
+	build.infohash = m.infohash
 
 def wipe_build(channel, game, build):
 	# gen vars

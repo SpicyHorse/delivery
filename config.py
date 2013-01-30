@@ -28,6 +28,8 @@ TRACKERS		= [
 		"udp://tracker.openbittorrent.com:80"
 	]
 ]
+LAUNCHER_VERSION_CONTROL = False
+LAUNCHER_VERSION_MIN = 0
 # your configuration can override some part of mine ;-)
 if path.isfile('config_local.py'):
 	execfile('config_local.py')

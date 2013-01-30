@@ -19,6 +19,7 @@
 			<thead>
 				<tr>
 					<th style="width:80px;">Game</th>
+					<th>Url</th>
 					<th>Description</th>
 				</tr>
 			</thead>
@@ -33,6 +34,7 @@
 				{% for g in channel.games %}
 				<tr>
 					<td><a href="{{ url_for('channel_game_view', channel=channel.name, game=g.name) }}">{{ g.name }}</a></td>
+					<td><a href="{{ g.url }}">{{ g.url }}</a></td>
 					<td>{{ g.description }}</td>
 				</tr>
 				{% endfor %}

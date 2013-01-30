@@ -32,6 +32,7 @@ class ChannelForm(Form):
 
 class GameForm(Form):
 	name		= TextField('Name', strict_name_validators)
+	url			= TextField('Url', [ validators.Required() ])
 	description	= TextField('Description')
 
 class BuildForm(Form):

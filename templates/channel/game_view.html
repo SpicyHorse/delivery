@@ -4,12 +4,13 @@
 
 {% block content %}
 <div class="page-header">
-	<h1>Game {{ game.name }}</h1>
+	<h1>Game {{ game.name }} (<a href="{{ game.url }}">{{ game.url }}</a>)</h1>
 </div>
 <div class="row">
 	<div class="span12">
 		<h3>Controls</h3>
 		<p>
+			<a href="{{ url_for('channel_game_edit', channel=game.channel.name, game=game.name) }}">Edit game</a>,
 			<a href="{{ url_for('channel_game_build_add', channel=game.channel.name, game=game.name) }}">Add new build</a>
 		</p>
 	</div>
@@ -22,7 +23,7 @@
 					<th style="width:120px;">Created At</th>
 					<th style="width:60px;">Platform</th>
 					<th>Description</th>
-					<th style="width:80px;">Downloads</th>
+					<th style="width:80px;">Ds/Ss/Ps</th>
 					<th style="width:160px;">Active</th>
 				</tr>
 			</thead>
@@ -40,7 +41,7 @@
 					<td>{{ b.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
 					<td>{{ b.platform }}</td>
 					<td>{{ b.description }}</td>
-					<td>{{ b.downloads }}</td>
+					<td>{{ b.downloads }}/{{ b.seeds }}/{{ b.peers }}</td>
 					<td>
 						{% if b.current %}
 						Active
