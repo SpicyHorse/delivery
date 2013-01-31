@@ -82,19 +82,22 @@ def channel_game_view(channel, game):
 	i = g.db.query(Game).options(joinedload(Game.builds, innerjoin=False)).filter(Channel.name == channel).filter(Game.name==game).first()
 	if not i:
 		return abort(404)
-	ts = {}
-	h = urlopen("http://delivery.spicyhorse.com/stats?mode=tpbs&format=txt")
-	for l in h.readlines():
-		l = l.strip().split(":")
-		ts[l[0]] = l[1:]
+	ts = cache.get('bt-stats')
+	if ts is None:
+		ts = {}
+		h = urlopen("http://delivery.spicyhorse.com/stats?mode=tpbs&format=txt")
+		for l in h.readlines():
+			l = l.strip().split(":")
+			ts[l[0]] = l[1:]
+		cache.set('bt-stats', ts, timeout=60)
 	for b in i.builds:
 		if ts.has_key(b.infohash):
-			b.seeds = ts[b.infohash][0]
-			b.peers = ts[b.infohash][1]
+			b.seeds = ts[b.infohash.upper()][0]
+			b.peers = ts[b.infohash.upper()][1]
 		else:
 			b.seeds = "-"
 			b.peers = "-"
-			
+	
 	return render_template("channel/game_view.html", game=i, ts=ts)
 
 @app.route("/channel/<string:channel>/<string:game>/add_build", methods=['GET', 'POST'])

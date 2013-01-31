@@ -1,3 +1,4 @@
+from werkzeug.contrib.cache import SimpleCache
 from functools import wraps
 from flask import *
 from os import path
@@ -7,6 +8,7 @@ import config
 app = Flask(__name__)
 app.debug = config.APP_DEBUG
 app.secret_key = config.APP_SECRET
+cache = SimpleCache()
 
 @app.errorhandler(404)
 def page_not_found(error):
