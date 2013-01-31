@@ -91,7 +91,7 @@ def channel_game_view(channel, game):
 			ts[l[0]] = l[1:]
 		cache.set('bt-stats', ts, timeout=60)
 	for b in i.builds:
-		if ts.has_key(b.infohash.upper()):
+		if b.infohash and ts.has_key(b.infohash.upper()):
 			b.seeds = ts[b.infohash.upper()][0]
 			b.peers = ts[b.infohash.upper()][1]
 		else:
