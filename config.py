@@ -19,16 +19,16 @@ STORAGE_URL		= "http://storage"
 STORAGE_DIR		= "storage"
 UPLOAD_DIR		= "uploads"
 TRACKERS		= [
-	[	# Primary tracker, will use only them if possible
+	[	# First tire
 		"http://delivery.spicyhorse.com:80/announce",
 		"udp://delivery.spicyhorse.com:80",
 	],
-	[	# Secondary trackers, fallback option
+	[	# Second tire
 		"udp://tracker.publicbt.com:80",
 		"udp://tracker.openbittorrent.com:80"
 	]
 ]
-LAUNCHER_VERSION_CONTROL = False
+LAUNCHER_VERSION_CONTROL = True
 LAUNCHER_VERSION_MIN = 0
 # your configuration can override some part of mine ;-)
 if path.isfile('config_local.py'):
