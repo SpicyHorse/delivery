@@ -33,9 +33,10 @@ def index():
 		)\
 		.filter(DownloadHistory.downloaded_at > datetime.now()-timedelta(1))\
 		.group_by(DownloadHistory.country_code)\
-		.order_by(DownloadHistory.country_code)\
+		.order_by(desc("dl_cnt"))\
 		.all()
 	cnt_stats_p = {}
 	for i in cnt_stats:
 		cnt_stats_p[i[0]] = i[1]
-	return render_template("index.html", dl_cnt_p=dl_cnt_p, cnt_stats_p=cnt_stats_p)
+	cnt_stats = cnt_stats[:25]
+	return render_template("index.html", dl_cnt_p=dl_cnt_p, cnt_stats=cnt_stats, cnt_stats_p=cnt_stats_p)
