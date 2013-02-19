@@ -11,18 +11,19 @@
 <script src="{{ url_for('static', filename='js/jquery-jvectormap-world-en.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery.flot.js') }}"></script>
 <script>
+var dlStats = {{cnt_stats_p|tojson|safe}};
 $(function(){
-	var gdpData = {{cnt_stats_p|tojson|safe}};
-	$('#map').vectorMap({map: 'world_en',
-	series: {
-		regions: [{
-			values: gdpData,
-			scale: ['#C8EEFF', '#0071A4'],
-			normalizeFunction: 'polynomial'
-		}]
-	},
+	$('#map').vectorMap({
+		map: 'world_en',
+		series: {
+			regions: [{
+				values: dlStats,
+				scale: ['#FF0000', '#00FF00'],
+				normalizeFunction: 'polynomial'
+			}]
+		},
 		onLabelShow: function(e, el, code){
-			el.html(el.html()+' (GDP - '+gdpData[code]+')');
+			el.html(el.html()+' (Downloads: '+dlStats[code]+')');
 		}
 	});
 	
