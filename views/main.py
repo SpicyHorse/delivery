@@ -18,15 +18,11 @@ def index():
 		.all()
 	enc = JSONEncoder()
 	dl_cnt_p = [[],[],[]]
-	for i in xrange(0, 25):
-		dl_cnt_p[0].append([i,0])
-		dl_cnt_p[1].append([i,0])
-		dl_cnt_p[2].append([i,0])
 	for i in dl_cnt:
 		x = i[0].hour
-		dl_cnt_p[0][x] = [x, i[1]]
-		dl_cnt_p[1][x] = [x, i[2]]
-		dl_cnt_p[2][x] = [x, i[3]]
+		dl_cnt_p[0].append([x, i[1]])
+		dl_cnt_p[1].append([x, i[2]])
+		dl_cnt_p[2].append([x, i[3]])
 	cnt_stats = g.db.query(
 			DownloadHistory.country_code,
 			func.count('*').label('dl_cnt')
