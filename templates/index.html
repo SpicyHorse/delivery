@@ -38,7 +38,10 @@ $(function(){
 				points: { show: true }
 		},
 		grid: { hoverable: true, autoHighlight: false },
-		xaxis: { ticks: 24, tickSize: 1, tickDecimals:0 }
+		xaxis: {
+			mode: "time",
+			timeformat: "%m/%d|%H.oo"
+		}
 	});
 })
 </script>

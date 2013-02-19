@@ -3,6 +3,7 @@ from datetime import timedelta
 from models import *
 
 from json import JSONEncoder
+from time import mktime
 
 @app.route('/')
 def index():
@@ -19,7 +20,7 @@ def index():
 	enc = JSONEncoder()
 	dl_cnt_p = [[],[],[]]
 	for i in dl_cnt:
-		x = i[0].hour
+		x = int(mktime(i[0].replace(minute=0, second=0, microsecond=0).timetuple())) * 1000
 		dl_cnt_p[0].append([x, i[1]])
 		dl_cnt_p[1].append([x, i[2]])
 		dl_cnt_p[2].append([x, i[3]])
