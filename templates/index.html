@@ -12,10 +12,11 @@
 <script src="{{ url_for('static', filename='js/jquery.flot.js') }}"></script>
 <script>
 $(function(){
+	var gdpData = {{cnt_stats_p|tojson|safe}};
 	$('#map').vectorMap({map: 'world_en',
 	series: {
 		regions: [{
-			values: {{cnt_stats_p|tojson|safe}},
+			values: gdpData,
 			scale: ['#C8EEFF', '#0071A4'],
 			normalizeFunction: 'polynomial'
 		}]
