@@ -35,5 +35,7 @@ def index():
 		.group_by(DownloadHistory.country_code)\
 		.order_by(DownloadHistory.country_code)\
 		.all()
-	print cnt_stats
-	return render_template("index.html", dl_cnt_p=dl_cnt_p, cnt_stats=cnt_stats)
+	cnt_stats_p = {}
+	for i in cnt_stats:
+		cnt_stats_p[i[0]] = i[1]
+	return render_template("index.html", dl_cnt_p=dl_cnt_p, cnt_stats_p=cnt_stats_p)
