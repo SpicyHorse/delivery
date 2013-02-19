@@ -1,5 +1,6 @@
 from datetime import datetime
 from database import *
+from engine.pygeoip import GEOIP
 
 from os import urandom, path
 from hashlib import sha256
@@ -91,3 +92,22 @@ class GameBuild(ModelBase):
 	def __init__(self, name=None, description=None):
 		self.name = name
 		self.description = description
+
+class DownloadHistory(ModelBase):
+	id				= Column(Integer, primary_key=True)
+	seed_cnt		= Column(Integer, nullable=False)
+	peer_cnt		= Column(Integer, nullable=False)
+	ipv4			= Column(Integer, nullable=False, index=True)
+	build_id		= Column(Integer, ForeignKey('GameBuild.id'), nullable=False)
+	country_code	= Column(CHAR(2), index=True)
+	downloaded_at	= Column(DateTime, nullable=False, index=True, default=datetime.now)
+	# relations
+	build			= relation(GameBuild)
+
+	def __init__(self, seed_cnt, peer_cnt, ipv4, build):
+		ip_info = GEOIP.lookup(ipv4)
+		self.seed_cnt		= seed_cnt
+		self.peer_cnt		= peer_cnt
+		self.ipv4			= ip_info.ipnum
+		self.country_code	= ip_info.country
+		self.build			= build

@@ -1,11 +1,7 @@
 from application import app, g, session, request, redirect, url_for
 from models import database_session, User
 
-__all__ = [ "admin", "user", "channel" ]
-
-@app.route('/')
-def index():
-	return redirect(url_for("channel_index"))
+__all__ = [ "admin", "user", "channel", "main" ]
 
 def is_active(name):
 	if request.endpoint and request.endpoint.startswith(name):

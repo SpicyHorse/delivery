@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}Slash{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-jvectormap.css') }}" />
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/jquery-jvectormap.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-jvectormap-world-en.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.flot.js') }}"></script>
+<script>
+$(function(){
+	$('#map').vectorMap({map: 'world_en',
+	series: {
+		regions: [{
+			values: {{cnt_stats|tojson|safe}},
+			scale: ['#C8EEFF', '#0071A4'],
+			normalizeFunction: 'polynomial'
+		}]
+	},
+		onLabelShow: function(e, el, code){
+			el.html(el.html()+' (GDP - '+gdpData[code]+')');
+		}
+	});
+	
+	plot = $.plot( $("#graph"),
+	[
+		{ data: {{dl_cnt_p[0]|tojson|safe}}, label: "Downloads"},
+		{ data: {{dl_cnt_p[1]|tojson|safe}}, label: "Seeds"},
+		{ data: {{dl_cnt_p[2]|tojson|safe}}, label: "Peers"}
+	], {
+			series: {
+				lines: { show: true },
+				points: { show: true }
+		},
+		grid: { hoverable: true, autoHighlight: false },
+		xaxis: { min: 0, max: 24, ticks: 24 }
+	});
+})
+</script>
+{% endblock %}
+	
+{% block content %}
+<div class="page-header">
+    <h1>Global statistics</h1>
+</div>
+
+<div class="row">
+	<div id="map" class="span12" style="height:460px;"></div>
+</div>
+
+<div class="page-header">
+	<h2>Download history: {{ dcnt }}</h2>
+</div>
+
+<div class="row">
+	<div id="graph" class="span12" style="height:200px;"></div>
+</div>
+
+<div class="page-header">
+	<h2>Top countries</h2>
+</div>
+
+{% endblock %}

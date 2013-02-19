@@ -54,7 +54,3 @@ def sendfile(file_path, file_name, redirect_base=None, speed_limit=None):
 		if speed_limit:
 			r.headers.add('X-Accel-Limit-Rate', speed_limit)
 		return r
-
-def paginate(query):
-	
-	return obj

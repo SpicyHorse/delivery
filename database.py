@@ -6,6 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy.types import TypeDecorator, CHAR, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql.expression import asc, desc
+from sqlalchemy.sql import func
 
 from sqlalchemy import Integer, Boolean, Date, DateTime, String, Text
 from sqlalchemy import Column, Table, ForeignKey, orm
@@ -18,10 +19,11 @@ __all__ = (
 	'create_engine', 'scoped_session', 'declarative_base', 'sessionmaker',
 	'ModelMeta', 'MetaData', 'QueuePool',
 	'Table', 'Column',
-	'Integer', 'String', 'Boolean', 'DateTime', 'Text', 'GUID', 'Enum',
+	'Integer', 'String', 'Boolean', 'DateTime', 'Text', 'GUID', 'Enum', 'CHAR',
 	'ForeignKey', 'PrimaryKeyConstraint',
 	'relation', 'backref', 'joinedload',
-	'asc', 'desc'
+	'asc', 'desc',
+	'func'
 )
 
 class GUID(TypeDecorator):

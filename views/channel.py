@@ -76,12 +76,7 @@ def channel_game_edit(channel, game):
 		return redirect(url_for('channel_game_view', channel=channel, game=game))
 	return render_template("form.html", title="Game form", form=f)
 
-@app.route("/channel/<string:channel>/<string:game>")
-@require_login
-def channel_game_view(channel, game):
-	i = g.db.query(Game).options(joinedload(Game.builds, innerjoin=False)).filter(Channel.name == channel).filter(Game.name==game).first()
-	if not i:
-		return abort(404)
+def get_bt_stat():
 	ts = cache.get('bt-stats')
 	if ts is None:
 		ts = {}
@@ -90,6 +85,15 @@ def channel_game_view(channel, game):
 			l = l.strip().split(":")
 			ts[l[0]] = l[1:]
 		cache.set('bt-stats', ts, timeout=60)
+	return ts
+
+@app.route("/channel/<string:channel>/<string:game>")
+@require_login
+def channel_game_view(channel, game):
+	i = g.db.query(Game).options(joinedload(Game.builds, innerjoin=False)).filter(Channel.name == channel).filter(Game.name==game).first()
+	if not i:
+		return abort(404)
+	ts = get_bt_stat()
 	for b in i.builds:
 		if b.infohash and ts.has_key(b.infohash.upper()):
 			b.seeds = ts[b.infohash.upper()][0]
@@ -162,6 +166,25 @@ def channel_game_build_wipe(channel, game, platform, build):
 
 launcher_url = lambda game: "LAUNCHER:%s" % game.url
 
+def get_version():
+	if request.headers.has_key('User-Agent'):
+		ua = request.headers['User-Agent']
+		if not ua.startswith("SpicyLauncher/"):
+			return None
+		return int(ua.split("/")[1])
+	else:
+		return None
+
+def count_download(build):
+	key = build.infohash.upper()
+	ts = get_bt_stat()
+	if ts.has_key(key):
+		st = ts[key]
+	else:
+		st = [ 0, 0 ]
+	dl = DownloadHistory(st[0], st[1], request.environ['REMOTE_ADDR'], build)
+	g.db.add(dl)
+
 @app.route("/channel/<string:channel>/<string:game>/<string:platform>/latest/<string:md5>")
 def torrent_check(channel, game, platform, md5):
 	# Fast inner join for querying
@@ -176,23 +199,22 @@ def torrent_check(channel, game, platform, md5):
 	if not i:
 		return abort(404)
 	# check launcher version
-	if config.LAUNCHER_VERSION_CONTROL:
-		if request.headers.has_key('User-Agent'):
-			ua = request.headers['User-Agent']
-			if not ua.startswith("SpicyLauncher/") or int(ua.split("/")[1]) < config.LAUNCHER_VERSION_MIN:
-				return make_response(launcher_url(i.game), 200)
-		else:
-			return make_response(launcher_url(i.game), 200)
-	# check user torrent version
-	if md5 == i.md5:
-		return make_response("FRESH", 200)
-	game_dst_torrent = os.path.join(config.STORAGE_DIR, channel, game, str(i.id), platform, "build.torrent")
-	i.downloads += 1
-	data = "UPDATE:"
-	data += open(game_dst_torrent).read()
-	g.db.add(i)
-	g.db.commit()
-	return make_response(data, 200)
+	lv = get_version()
+	if lv is None or lv < config.LAUNCHER_VERSION_MIN:
+		return make_response(launcher_url(i.game), 200)
+	# Return launcher version corresponding response
+	if lv < 2:
+		if md5 == i.md5:
+			return make_response("FRESH", 200)
+		game_dst_torrent = os.path.join(config.STORAGE_DIR, channel, game, str(i.id), platform, "build.torrent")
+		i.downloads += 1
+		data = "UPDATE:" + open(game_dst_torrent).read()
+		count_download(i)
+		g.db.add(i)
+		g.db.commit()
+		return make_response(data, 200)
+	else:
+		return abort(418)
 
 @app.route("/channel/<string:publisher>/<string:game>/<string:platform>/storage/<path:file_path>")
 def storage(publisher, game, platform, file_path):
