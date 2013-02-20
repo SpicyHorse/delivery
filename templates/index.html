@@ -11,36 +11,42 @@
 <script src="{{ url_for('static', filename='js/jquery-jvectormap-world-en.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery.flot.js') }}"></script>
 <script>
-var dlStats = {{cnt_stats_p|tojson|safe}};
+var cntryStats = {{cnt_stats_p|tojson|safe}};
+var dlStats = {{dl_cnt_p|tojson|safe}};
+var tzOfset = (new Date()).getTimezoneOffset() * 60;
+for (var i = dlStats.length - 1; i >= 0; i--){
+	for (var e = dlStats[i].length - 1; e >= 0; e--){
+		dlStats[i][e][0]=(dlStats[i][e][0]-tzOfset) * 1000;
+	};
+};
 $(function(){
 	$('#map').vectorMap({
 		map: 'world_en',
 		series: {
 			regions: [{
-				values: dlStats,
+				values: cntryStats,
 				scale: ['#C8EEFF', '#0071A4'],
 				normalizeFunction: 'polynomial'
 			}]
 		},
 		onRegionLabelShow: function(e, el, code){
-			el.html(el.html()+' (Downloads: '+dlStats[code]+')');
+			el.html(el.html()+' (Downloads: '+cntryStats[code]+')');
 		}
 	});
-	
 	plot = $.plot( $("#graph"),
 	[
-		{ data: {{dl_cnt_p[0]|tojson|safe}}, label: "Downloads"},
-		{ data: {{dl_cnt_p[1]|tojson|safe}}, label: "Seeds"},
-		{ data: {{dl_cnt_p[2]|tojson|safe}}, label: "Peers"}
+		{ data: dlStats[0], label: "Downloads"},
+		{ data: dlStats[1], label: "Seeds"},
+		{ data: dlStats[2], label: "Peers"}
 	], {
-			series: {
+		series: {
 				lines: { show: true },
 				points: { show: true }
 		},
 		grid: { hoverable: true, autoHighlight: false },
 		xaxis: {
 			mode: "time",
-			timeformat: "%H:%M<br>%m/%d"
+			timeformat: "%H:%M\<br\>%m/%d"
 		}
 	});
 })
@@ -49,7 +55,7 @@ $(function(){
 	
 {% block content %}
 <div class="page-header">
-    <h1>Global statistics</h1>
+    <h1>Global statistics (last 24h)</h1>
 </div>
 
 <div class="row">
@@ -57,7 +63,7 @@ $(function(){
 </div>
 
 <div class="page-header">
-	<h2>Download history: {{ dcnt }}</h2>
+	<h2>Download history</h2>
 </div>
 
 <div class="row">
