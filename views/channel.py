@@ -203,7 +203,7 @@ def torrent_check(channel, game, platform, md5):
 	if lv is None or lv < config.LAUNCHER_VERSION_MIN:
 		return make_response(launcher_url(i.game), 200)
 	# Return launcher version corresponding response
-	if lv < 2:
+	if lv < 3:
 		if md5 == i.md5:
 			return make_response("FRESH", 200)
 		game_dst_torrent = os.path.join(config.STORAGE_DIR, channel, game, str(i.id), platform, "build.torrent")
